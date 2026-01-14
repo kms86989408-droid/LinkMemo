@@ -249,43 +249,58 @@
       }
 
       function showArticles() {
-        $.ajax({
-          type: "GET",
-          url: "/memo",
-          data: {},
-          success: function (response) {
-            let articles = response["articles"];
-            for (let i = 0; i < articles.length; i++) {
-              makeCard(
-                articles[i]["image"],
-                articles[i]["url"],
-                articles[i]["title"],
-                articles[i]["desc"],
-                articles[i]["comment"]
-              );
-            }
-          },
-        });
+  $.ajax({
+    type: "GET",
+    url: "/memo",
+    success: function (response) {
+      console.log("GET /memo response:", response);
+
+      if (response["result"] !== "success") {
+        console.log("서버 result 실패:", response);
+        return;
       }
+
+      let articles = response["articles"] || [];
+      console.log("articles length:", articles.length);
+
+      $("#cards-box").empty(); // 여기서 지우는게 더 안전
+
+      for (let i = 0; i < articles.length; i++) {
+        makeCard(
+          articles[i]["image"] || "",
+          articles[i]["url"] || "#",
+          articles[i]["title"] || "(제목 없음)",
+          articles[i]["desc"] || "",
+          articles[i]["comment"] || ""
+        );
+      }
+    },
+    error: function (xhr) {
+      console.log("GET /memo 실패", xhr.status, xhr.responseText);
+    },
+  });
+}
+
 
       function makeCard(image, url, title, desc, comment) {
-        let tempHtml = `<div class="col">
-                    <div class="card">
-                      <img
-                        src="${image}"
-                        class="card-img-top"
-                        alt="..."
-                      />
-                      <div class="card-body">
-                        <a href="${url}" target="_blank" class="card-title">${title}</a>
-                        <p class="card-text">${desc}</p>
-                        <p class="card-text comment">${comment}</p>
-                    </div>
-                  </div>`;
-        $("#cards-box").append(tempHtml);
-      }
+  let tempHtml = `
+    <div class="col">
+      <div class="card h-100">
+        <img src="${image}" class="card-img-top" alt="..." />
+        <div class="card-body">
+          <a href="${url}" target="_blank" class="card-title h5 d-block">${title}</a>
+          <p class="card-text">${desc}</p>
+          <p class="card-text comment">${comment}</p>
+        </div>
+      </div>
+    </div>
+  `;
+  $("#cards-box").append(tempHtml);
+  console.log("카드생성완료:", title);
+}
 
-      function makeCard(url, title, desc, comment, image) {}
+
+      
     </script>
   </body>
 </html>

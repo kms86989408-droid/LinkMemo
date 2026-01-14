@@ -36,9 +36,9 @@ def saving():
         og_description = soup.select_one('meta[property="og:description"]')
 
         article = {'url': url_receive, 
-                    'title': og_title['content'], 
-                    'desc': og_description['content'],
-                    'image': og_image['content'],
+                    'title': og_title['content'] if og_title else 'No title', 
+                    'desc': og_description['content'] if og_description else 'No description',
+                    'image': og_image['content'] if og_image else 'No image',
                     'comment': comment_receive}
 
 		# 3. mongoDB에 데이터 넣기
@@ -48,9 +48,9 @@ def saving():
 @app.route('/memo', methods=['GET'])
 def read_articles():
     # 1. mongoDB에서 _id 값을 제외한 모든 데이터 조회해오기 (Read)
-    result = list(db.articles.find({}, {'_id': 0}))
+    result = list(db.memos.find({}, {'_id': 0}))
     # 2. articles라는 키 값으로 article 정보 보내주기
     return jsonify({'result': 'success', 'articles': result})
 
 if __name__ == '__main__':
-    app.run('0.0.0.0',port=5000,debug=True)
+    app.run('0.0.0.0',port=5000,debug=True, use_reloader=False)
